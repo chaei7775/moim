@@ -4,6 +4,13 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://chaei7775.github.io/moim/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#789777">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="모임놀이터">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Nanum+Myeongjo:wght@400;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
 <style>
@@ -1008,6 +1015,7 @@ var THUMBS={"pocha": "data:image/webp;base64,UklGRjQ7AABXRUJQVlA4ICg7AAAQ7QCdASo
     $('result').hidden=true; window.scrollTo({top:0,behavior:'smooth'});
   });
   /* 화면 확인용 */
+  try{ if('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && location.hostname.indexOf('github.io')>=0) navigator.serviceWorker.register('sw.js').catch(function(){}) }catch(e){}
   window.__bm={card:function(){return makeCard(TPL[tplKey],info())},ready:assetsReady,setTpl:function(k){tplKey=k},render:function(t){var th=TPL[tplKey]; timing(th,photos.length); frame(t,photos.length,th,info()); return cv.toDataURL('image/jpeg',.82)},T:T};
   renderThumbs();
 })();

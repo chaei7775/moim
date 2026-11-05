@@ -1,0 +1,17 @@
+{
+  "name": "모임놀이터",
+  "short_name": "모임놀이터",
+  "description": "모임 사진으로 감성 후기 영상과 카드를 만들어요",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F8F6",
+  "theme_color": "#789777",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
