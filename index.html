@@ -221,7 +221,7 @@ video{width:100%; max-height:70vh; border-radius:18px; background:#000; display:
     <video id="vid" controls playsinline hidden></video>
     <div class="price"><b>무료 체험 중</b><span>지금은 모든 템플릿을 무료로 써볼 수 있어요</span></div>
     <a class="btn" id="saveBtn" role="button" aria-disabled="true" download="모임놀이터-후기영상.mp4">영상 저장하기</a>
-    <p class="note" id="vidNote" hidden>결제 연결 전이라 지금은 무료로 저장돼요.</p>
+    <p class="note" id="vidNote" hidden>지금은 무료로 저장돼요.</p>
     <img class="card-img" id="cardImg" alt="후기 카드" hidden>
     <p class="note" id="cardNote" hidden>후기 카드는 사진을 길게 눌러도 저장할 수 있어요.</p>
     <button class="btn ghost" id="saveCard" type="button" hidden>후기 카드 저장하기</button>
@@ -684,7 +684,7 @@ var THUMBS={"pocha": "data:image/webp;base64,UklGRjQ7AABXRUJQVlA4ICg7AAAQ7QCdASo
     }
     return {
       cream:function(c){var g=c.createLinearGradient(0,0,0,H); g.addColorStop(0,cfg.cream[0]); g.addColorStop(1,cfg.cream[1]); c.fillStyle=g; c.fillRect(0,0,W,H)},
-      fx:cfg.fx||{},
+      fx:cfg.fx||{}, pageList:cfg.pages,
       win:function(c,pg,j,pic,pt,isP){
         var m=IM[pg.w+j]; if(!m||!pic) return; var bb=m.bb, w=bb[2]-bb[0], h=bb[3]-bb[1], en=(cfg.fx&&cfg.fx.enter)||'pop', e=ease(pt);
         var sc=1,dx=0,dy=0,rot=0,sx=1,al=1,zm=1.03+.02*pt,cx=0;
@@ -877,6 +877,15 @@ var THUMBS={"pocha": "data:image/webp;base64,UklGRjQ7AABXRUJQVlA4ICg7AAAQ7QCdASo
   function makeCard(th,inf){
     var c=document.createElement('canvas'), w=1080, h=1350; c.width=w; c.height=h; var x=c.getContext('2d');
     var key=tplKey;
+    if(PAGEK[key]){
+      var SX=S[key], PP=SX.pages||null;
+      var cfgPages=SX.pageList, n0=Math.max(1,Math.min(photos.length,6)), bi=0, bc=-1;
+      for(var q=0;q<cfgPages.length;q++){ var cn=cfgPages[q].count; if(cn<=n0&&cn>bc){bc=cn;bi=q} }
+      c.width=1080; c.height=1920; x.save(); x.scale(1.5,1.5);
+      TA.on=false; SX.page(x,0,bi,0,cfgPages[bi].count,-1,1,photos.length,inf.title);
+      x.restore(); watermark(x,1080,1920,38);
+      return c.toDataURL('image/png');
+    }
     var bgs={memory:['#EADCC6','#E2CFB4'],carrot:['#FF8A2B','#FFC94D'],trip:['#8FCBFF','#FFF3D2'],collage:['#FFF1E2','#FFE3EC'],movie:['#222A58','#3A3F73'],pocha:['#2B3150','#1B2038'],party:['#14110F','#2A2016'],film:['#1A120D','#0E0906']};
     var gg=x.createLinearGradient(0,0,0,h); gg.addColorStop(0,bgs[key][0]); gg.addColorStop(1,bgs[key][1]); x.fillStyle=gg; x.fillRect(0,0,w,h);
     var dark=(key==='party'||key==='film'||key==='movie'||key==='pocha'), tc=dark?'#F6E7C1':(key==='trip'?'#1F4E8C':(key==='memory'||key==='collage'?'#6B4A3A':'#3A1F0B'));
@@ -978,21 +987,23 @@ var THUMBS={"pocha": "data:image/webp;base64,UklGRjQ7AABXRUJQVlA4ICg7AAAQ7QCdASo
     function done(){busy=false; $('makeBtn').disabled=photos.length<1}
   });
   var lastBlob=null, dlNS=null;
-  try{ if(window.claude&&window.claude.use){ window.claude.use('downloads').then(function(d){ dlNS=d; if(d) $('saveCard').hidden=false }).catch(function(){}) } }catch(e){}
+  $('saveCard').hidden=false;
+  try{ if(window.claude&&window.claude.use){ window.claude.use('downloads').then(function(d){ dlNS=d }).catch(function(){}) } }catch(e){}
   function dlErr(er){ if(er&&er.code==='declined') return; showErr('저장하지 못했어요. 영상은 위 미리보기에서 길게 눌러 저장해 보세요.') }
   $('saveBtn').addEventListener('click',function(e){
     if(!lastBlob||this.getAttribute('aria-disabled')==='true'){e.preventDefault(); return}
     if(dlNS){ e.preventDefault(); showErr(''); var ext=(lastBlob.type||'').indexOf('mp4')>=0?'mp4':'webm'; dlNS.save({filename:'모임놀이터-후기영상.'+ext,data:lastBlob}).catch(dlErr) }
   });
   $('saveCard').addEventListener('click',function(){
-    if(!dlNS) return; showErr('');
+    showErr('');
+    if(!dlNS){ var a=document.createElement('a'); a.href=$('cardImg').src; a.download='모임놀이터-후기카드.png'; document.body.appendChild(a); a.click(); a.remove(); return }
     fetch($('cardImg').src).then(function(r){return r.blob()}).then(function(b){return dlNS.save({filename:'모임놀이터-후기카드.png',data:b})}).catch(dlErr);
   });
   $('againBtn').addEventListener('click',function(){
     $('result').hidden=true; window.scrollTo({top:0,behavior:'smooth'});
   });
   /* 화면 확인용 */
-  window.__bm={ready:assetsReady,setTpl:function(k){tplKey=k},render:function(t){var th=TPL[tplKey]; timing(th,photos.length); frame(t,photos.length,th,info()); return cv.toDataURL('image/jpeg',.82)},T:T};
+  window.__bm={card:function(){return makeCard(TPL[tplKey],info())},ready:assetsReady,setTpl:function(k){tplKey=k},render:function(t){var th=TPL[tplKey]; timing(th,photos.length); frame(t,photos.length,th,info()); return cv.toDataURL('image/jpeg',.82)},T:T};
   renderThumbs();
 })();
 </script>
